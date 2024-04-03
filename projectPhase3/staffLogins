@@ -1,4 +1,4 @@
-Username,Password
-test,test
-username,password
-siddhant,password
+Username,Password,userType
+test,test,doctor
+username,password,doctor
+siddhant,password,nurse

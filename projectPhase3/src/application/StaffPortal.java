@@ -72,7 +72,6 @@ public class StaffPortal {
 		passwordHolder.setAlignment(Pos.CENTER);
 		passwordHolder.setSpacing(10);
 
-
 		// Login button
 		Button staffLoginButton = new Button("Login");
 		staffLoginButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
@@ -80,27 +79,22 @@ public class StaffPortal {
 			String userNameInput = staffUserNameField.getText();
 			String passwordInput = passwordField.getText();
 
-			if (userNameInput.equals("") && passwordInput.equals("")) {
+			if (userNameInput.equals("") || passwordInput.equals("")) {
 
-				createPopup("Please input the Username and Password", true);
+				createPopup("Please provide inputs for the necessary fields", true);
 
-			} else if (userNameInput.equals("")) {
-
-				createPopup("Please input the Username", true);
-
-			} else if (passwordInput.equals("")) {
-
-				createPopup("Please input the Password", true);
 			} else {
 
-				if (checkLogin(userNameInput, passwordInput)) {
-					System.out.println("User exists within the DB");
-//					ownerStage.setScene(new staffPatientLookUp().staffPatientLookUp(scene, ownerStage, userNameInput));
-				} else {
-					System.out.println("User DOES NOT exist");
-					// creates a popUp at the specified location
-					createPopup("The Staff member does not Exist within the Database", true);
+				String userType = checkLogin(userNameInput, passwordInput);
 
+				if (userType.equals("invalid")) {
+					createPopup("The Staff member does not Exist within the Database", true);
+				} else if (userType.equals("doctor")) {
+					//TODO connect to doctor view page
+					System.out.println("The staff member is a doctor");
+				} else {
+					//TODO connect to nurse view page
+					System.out.println("The staff member is a nurse");
 				}
 			}
 
@@ -163,28 +157,30 @@ public class StaffPortal {
 		popupStage.show();
 	}
 
-	private boolean checkLogin(String userName, String password) {
+	private String checkLogin(String userName, String password) {
 
-		boolean foundUser = false;
+		String userType = "invalid";
 
 		try (BufferedReader reader = new BufferedReader(new FileReader("staffLogins"))) {
-			String userLogin = userName + "," + password;
 			String line;
 			boolean isFirstLine = true;
 			while ((line = reader.readLine()) != null) {
 				if (isFirstLine == true) {
 					isFirstLine = false;
 				} else {
-					if (line.equals(userLogin)) {
-						foundUser = true;
+					String[] fields = line.split(",");
+
+					if (fields.length == 3 && fields[0].equals(userName) && fields[1].equals(password)) {
+						userType = fields[2];
 						break;
 					}
+
 				}
 			}
 			reader.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return foundUser;
+		return userType;
 	}
 }
