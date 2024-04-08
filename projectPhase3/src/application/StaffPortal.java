@@ -91,7 +91,8 @@ public class StaffPortal {
 					createPopup("The Staff member does not Exist within the Database", true);
 				} else if (userType.equals("doctor")) {
 					//TODO connect to doctor view page
-					System.out.println("The staff member is a doctor");
+//					System.out.println("The staff member is a doctor");
+					ownerStage.setScene(new DoctorPatientLookUp().patientLookUp(scene, ownerStage, userNameInput));
 				} else {
 					//TODO connect to nurse view page
 					System.out.println("The staff member is a nurse");

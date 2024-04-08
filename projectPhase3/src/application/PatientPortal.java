@@ -1,6 +1,8 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDate;
@@ -94,23 +96,17 @@ public class PatientPortal {
 			String firstNameInput = firstNameField.getText();
 			String lastNameInput = lastNameField.getText();
 
-			
-			if(firstNameInput.equals("") || lastNameInput.equals("") || dobPicker.getValue() == null) {
+			if (firstNameInput.equals("") || lastNameInput.equals("") || dobPicker.getValue() == null) {
 				createPopup("Please provide input for all the fields!", true);
 			} else {
 				String dobInput = dobPicker.getValue().toString();
 				System.out.println(dobPicker.getValue());
 				
-				if(checkLogin(firstNameInput, lastNameInput, dobInput)) {
-					//TODO connect patient view here and remove the print statement
-					System.out.println("The Patient is in the DB");
-				} else {
-					createPopup("The Patient does not Exist within the Database", true);
-				}
-				
+				File patientFile = checkRecords(firstNameInput, lastNameInput, dobInput);
+				ownerStage.setScene(new PatientDataView().patientTabs(scene, ownerStage, patientFile));
+
 			}
 
-			
 		});
 
 		// adding everything to a VBox
@@ -126,8 +122,9 @@ public class PatientPortal {
 		return scene;
 
 	}
-	
-	//generates popups: needs error string and if the error is an actual error or a suggestion
+
+	// generates popups: needs error string and if the error is an actual error or a
+	// suggestion
 	private void createPopup(String errorString, boolean actualError) {
 		Stage popupStage = new Stage();
 		popupStage.initModality(Modality.APPLICATION_MODAL); // Makes the popup modal
@@ -169,35 +166,38 @@ public class PatientPortal {
 		popupStage.setScene(popupScene);
 		popupStage.show();
 	}
-	
-	
-	//checks login info of the patient within the patientLogins file
-	private boolean checkLogin(String firstName, String lastName, String dob) {
 
-		boolean foundPatient = false;
+	// check patient record within the patientInfo folder
+	private File checkRecords(String firstName, String lastName, String dob) {
+		
+		String folderPth = "patientInfo";
+		//TODO add DOB to filename
+		String filenm = firstName + "_" + lastName + "_" + dob + "_" + "patientinfo.txt";
 
-		try (BufferedReader reader = new BufferedReader(new FileReader("patientLogins"))) {
-			String patientLogin = firstName + "," + lastName + "," + dob;
-			System.out.println(patientLogin);
-			String line;
-			boolean isFirstLine = true;
-			while ((line = reader.readLine()) != null) {
-				if (isFirstLine == true) {
-					isFirstLine = false;
-				} else {
-					if (line.equals(patientLogin)) {
-						foundPatient = true;
-						break;
-					}
+		File folder = new File(folderPth);
+
+		// check if the file exists within the folder
+
+		if (folder.exists() && folder.isDirectory()) {
+			File[] files = folder.listFiles();
+
+			for (File file : files) {
+				if (file.isFile() && file.getName().equals(filenm)) {
+					return file;
 				}
 			}
-			reader.close();
+
+		} 
+		
+		File patientFile = new File(folderPth, filenm);
+		try {
+			patientFile.createNewFile();
 		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return foundPatient;
+		
+		return patientFile;
 	}
-
-	
 
 }
