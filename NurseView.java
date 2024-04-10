@@ -24,6 +24,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
@@ -31,7 +32,7 @@ import javafx.stage.Stage;
 public class NurseView {
 
 	File patientFile;
-
+	   
 	public Scene patientTabs(Scene previousScene, Stage ownerStage, File pFile) {
 
 		this.patientFile = pFile;
@@ -53,9 +54,19 @@ public class NurseView {
 
 		Tab healthConcernsTab = new Tab("Health Concerns");
 		healthConcernsTab.setContent(createHealthConcernsTab());
-
+		
+		Tab patientHistoryTab = new Tab("Patient History");
+		patientHistoryTab.setContent(createpatientHistoryTab());
+		
+		Tab logOutTab = new Tab("Back to Patient Look Up");
+		logOutTab.setOnSelectionChanged(e -> {
+			if(logOutTab.isSelected()) {
+				ownerStage.setScene(previousScene);
+			}
+		});
+		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(vitalsTab, allergiesTab, healthConcernsTab);
+		tabPane.getTabs().addAll(vitalsTab, allergiesTab, healthConcernsTab, patientHistoryTab, logOutTab );
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
@@ -63,67 +74,105 @@ public class NurseView {
 		return scene;
 	}
 
-	private BorderPane createHealthConcernsTab() {
+	private BorderPane createpatientHistoryTab() {
+
 		BorderPane root = new BorderPane();
 
-		Label healthConcernsLabel = new Label("Health Concerns:");
-		healthConcernsLabel.setFont(Font.font("Arial", 30));
+		// Labels for fields
+		Label prevHealthIssuesLabel = new Label("Previous Health Issues:");
+		Label prevMedsLabel = new Label("Previously Prescribed Medication:");
+		Label immunizationLabel = new Label("History of Immunization:");
 
-		// TextArea to display appointment summary
-		TextArea healthConcernsTextArea = new TextArea();
-		healthConcernsTextArea.setText(fileField("Health Concerns"));
-		healthConcernsTextArea.setPrefRowCount(10);
-		healthConcernsTextArea.setEditable(true);
-		healthConcernsTextArea.setText(fileField("Health Concerns"));
-		
-//		// Button to save changes
-//				Button saveButton = new Button("Save");
-//				saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
-//				saveButton.setOnAction(e -> {
-//
-//					// Save changes to the file
-//					saveChanges("Health Concerns:", healthConcernsTextArea.getText());
-//					
-//					File newPatientFile = new File("patientInfo",
-//							fileField(firstNameField).getText() + "_" + lastNameField.getText() + "_" + dob + "_" + "patientinfo.txt");
-//					patientFile.renameTo(newPatientFile);
-//					patientFile = newPatientFile;
-//
-//				});
-		
+		// Text fields for editable information
+		TextField prevHealthIssuesField = new TextField();
+		prevHealthIssuesField.setEditable(false);
+		prevHealthIssuesField.setText(fileField("Previous Health Issues"));
 
+		TextField prevMedsField = new TextField();
+		prevMedsField.setEditable(false);
+		prevMedsField.setText(fileField("Previous Medications"));
+
+		TextField immunizationField = new TextField();
+		immunizationField.setEditable(false);
+		immunizationField.setText(fileField("History of Immunization"));
+		
 		// Layout setup
-		VBox vbox = new VBox(20, healthConcernsLabel, healthConcernsTextArea);
+		GridPane gridPane = new GridPane();
+		gridPane.addRow(0, prevHealthIssuesLabel, prevHealthIssuesField);
+		gridPane.addRow(1, prevMedsLabel, prevMedsField);
+		gridPane.addRow(2, immunizationLabel, immunizationField);
+		
+		gridPane.setHgap(10);
+		gridPane.setVgap(10);
+		gridPane.setAlignment(Pos.CENTER);
+
+		VBox vbox = new VBox(20, gridPane);
 		vbox.setAlignment(Pos.CENTER);
 		vbox.setPadding(new Insets(50));
 
 		root.setCenter(vbox);
 
 		return root;
+
 	}
 	
 	private BorderPane createAllergiesTab() {
-		BorderPane root = new BorderPane();
+	    BorderPane root = new BorderPane();
 
-		Label allergiesLabel = new Label("Known Allergies:");
-		allergiesLabel.setFont(Font.font("Arial", 30));
+	    Label allergiesLabel = new Label("Allergies:");
+	    allergiesLabel.setFont(Font.font("Arial", 30));
 
-		// TextArea to display appointment summary
-		TextArea allergiesTextArea = new TextArea();
-		allergiesTextArea.setPrefRowCount(10);
-		allergiesTextArea.setEditable(true);
-		allergiesTextArea.setText(fileField("Known Allergies"));
+	    // TextArea to display known allergies
+	    TextArea allergiesTextArea = new TextArea(retrieveTextArea("Allergies"));
+	    allergiesTextArea.setPrefRowCount(10);
+	    allergiesTextArea.setEditable(true);
 
-		// Layout setup
-		VBox vbox = new VBox(20, allergiesLabel, allergiesTextArea);
-		vbox.setAlignment(Pos.CENTER);
-		vbox.setPadding(new Insets(50));
+	    // Button to save changes
+	    Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(e -> {
+	       
+	        saveChangesForTextArea(allergiesTextArea, "Allergies:"); 
+	    });
 
-		root.setCenter(vbox);
+	    // Layout setup
+	    VBox vbox = new VBox(20, allergiesLabel, allergiesTextArea, saveButton);
+	    vbox.setAlignment(Pos.CENTER);
+	    vbox.setPadding(new Insets(50));
 
-		return root;
+	    root.setCenter(vbox);
+
+	    return root;
 	}
+	
+	private BorderPane createHealthConcernsTab() {
+	    BorderPane root = new BorderPane();
 
+	    Label healthConcernsLabel = new Label("Health Concerns:");
+	    healthConcernsLabel.setFont(Font.font("Arial", 30));
+
+	    // TextArea to display health concerns
+	    TextArea healthConcersnTextArea = new TextArea(retrieveTextArea("Health Concerns"));
+	    healthConcersnTextArea.setPrefRowCount(10);
+	    healthConcersnTextArea.setEditable(true);
+
+	    // Button to save changes
+	    Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(e -> {
+	       
+	        saveChangesForTextArea(healthConcersnTextArea, "Health Concerns:"); 
+	    });
+
+	    // Layout setup
+	    VBox vbox = new VBox(20, healthConcernsLabel, healthConcersnTextArea, saveButton);
+	    vbox.setAlignment(Pos.CENTER);
+	    vbox.setPadding(new Insets(50));
+
+	    root.setCenter(vbox);
+
+	    return root;
+	}
 
 	private BorderPane createVitalsTab() {
 
@@ -168,7 +217,7 @@ public class NurseView {
 		
 		TextField bloodPressureField = new TextField();
 		bloodPressureField.setText(fileField("Blood Pressure"));
-
+		
 		// Button to save changes
 		Button saveButton = new Button("Save");
 		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
@@ -210,21 +259,19 @@ public class NurseView {
 		gridPane.addRow(6, bodyTemperatureLabel, bodyTemperatureField);
 		gridPane.addRow(7, bloodPressureLabel, bloodPressureField);
 		
+	    gridPane.setHgap(10);
+	    gridPane.setVgap(10);
+	    gridPane.setAlignment(Pos.CENTER);
 
-		gridPane.setHgap(10);
-		gridPane.setVgap(10);
-		gridPane.setAlignment(Pos.CENTER);
+	    VBox vbox = new VBox(20, gridPane, saveButton);
+	    vbox.setAlignment(Pos.CENTER);
+	    vbox.setPadding(new Insets(50));
 
-		VBox vbox = new VBox(20, gridPane, saveButton);
-		vbox.setAlignment(Pos.CENTER);
-		vbox.setPadding(new Insets(50));
+	    root.setCenter(vbox);
 
-		root.setCenter(vbox);
-
-		return root;
-
+	    return root;
 	}
-
+	
 	private void saveChanges(String fieldName, String newFieldString) {
 		System.out.println("This is hte fieldname: " + fieldName);
 		System.out.println("This is hte newFieldString: " + newFieldString);
@@ -291,5 +338,97 @@ public class NurseView {
 		return resultString;
 
 	}
+	
+	private String retrieveTextArea(String fieldName) {
+        StringBuilder notesBuilder = new StringBuilder();
 
+        try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
+            String line;
+            boolean startNotes = false;
+
+            while ((line = br.readLine()) != null) {
+                if (startNotes) {
+
+                    if (line.contains(":")) {
+                        break;
+                    }
+
+                    notesBuilder.append(line).append("\n");
+                } else {
+                    String[] fields = line.split(":");
+
+                    if (fields[0].trim().equals(fieldName)) {
+                        notesBuilder.append(fields[1].trim()).append("\n");
+                        startNotes = true;
+
+                    }
+
+                }
+
+            }
+
+        } catch (FileNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        return notesBuilder.toString();
+
+    }
+	
+	private void saveChangesForTextArea(TextArea notesTextArea, String fieldName) {
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(patientFile))) {
+            StringBuilder fileContent = new StringBuilder();
+            String line;
+            boolean foundField = false;
+            boolean addField = false;
+
+            while ((line = reader.readLine()) != null) {
+
+                if (line.startsWith(fieldName)) {
+                    foundField = true;
+                    addField = true;
+                }
+
+                if (foundField) {
+//                    System.out.println("Not ")
+                    if (!line.startsWith(fieldName)) {
+                        if (line.contains(":")) {
+                            fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+                            fileContent.append(line).append("\n");
+                            foundField = false;
+                        }
+                    }
+
+                } else {
+                    fileContent.append(line).append("\n");
+                }
+
+            }
+
+            if (!addField) {
+                fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+            } else if (addField && foundField) {
+                fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+            }
+
+            // Write the updated content back to the file
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(patientFile))) {
+                writer.write(fileContent.toString());
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+	
 }
