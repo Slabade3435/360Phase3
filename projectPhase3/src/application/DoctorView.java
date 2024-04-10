@@ -59,6 +59,8 @@ public class DoctorView {
 
 		Tab NotesTab = new Tab("Notes");
 		NotesTab.setContent(notes());
+
+		Messages doctorMessaging = new Messages();
 		
 		Tab logOutTab = new Tab("Back to Patient Look up");
 		logOutTab.setOnSelectionChanged(e -> {
@@ -68,7 +70,7 @@ public class DoctorView {
 		});
 		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
+		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, doctorMessaging.createTab(), logOutTab);
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
