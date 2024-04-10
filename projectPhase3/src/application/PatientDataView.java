@@ -62,6 +62,8 @@ public class PatientDataView {
 
 		Tab healthResourcesTab = new Tab("Health and Wellness Resources");
 		healthResourcesTab.setContent(createHealthResourcesTab());
+
+		Messages2 patientMessaging = new Messages2();
 		
 		Tab logOutTab = new Tab("Log Out");
 		logOutTab.setOnSelectionChanged(e -> {
@@ -71,7 +73,7 @@ public class PatientDataView {
 		});
 
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(personalInfoTab, patientHistoryTab, appointmentSummaryTab, insuranceInfoTab, pharmacyInfoTab, healthResourcesTab, logOutTab);
+		tabPane.getTabs().addAll(personalInfoTab, patientHistoryTab, appointmentSummaryTab, insuranceInfoTab, pharmacyInfoTab, healthResourcesTab, patientMessaging.createTab(), logOutTab);
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
