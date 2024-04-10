@@ -1,0 +1,31 @@
+First Name: test
+Last Name: test
+Date of Birth: 2024-04-03
+Previous Health Issues: Cancer
+Previous Medications: Nothing
+History of Immunization: Covid
+Insurance ID: 67584
+Phone Number: 12345667890
+Pharmacy: CVS
+Address: Elliot RD
+Medication: RXT
+Dose (mg): 2
+Frequency: twice a day
+
+Medication: Covid
+Dose (mg): 1
+Frequency: everyday
+
+Age: 12
+
+Allergies: nowww we shall see if this little one workds
+
+Pollenn
+
+Additional Notes: YOOO SO IM GONNA ADD SOME NOTES INTO THS
+We will be the judge of it and see if ot acc
+works or not
+Is this one saved?
+
+Diagnosis: Sore throat-this is bad
+Arm Pain - this is really bad

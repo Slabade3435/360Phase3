@@ -112,7 +112,7 @@ public class DoctorPatientLookUp {
 			} else {
 				String dobInput = dobPicker.getValue().toString();
 //				System.out.println(dobPicker.getValue());
-				
+
 				File patientFile = checkRecords(firstNameInput, lastNameInput, dobInput);
 				if (patientFile != null) {
 					// TODO connect to Doctor Tab of the patient, should g
@@ -138,63 +138,96 @@ public class DoctorPatientLookUp {
 
 	}
 
-	//check patient record within the patientInfo folder
+	// check patient record within the patientInfo folder
 	private File checkRecords(String firstName, String lastName, String dob) {
 
 		String folderPth = "patientInfo";
-		//TODO add DOB to filename
-		String filenm = firstName + "_" + lastName + "_" + "patientinfo.txt";
+		// TODO add DOB to filename
+		String filenm = firstName + "_" + lastName + "_" + dob + "_" + "patientinfo.txt";
 
 		File folder = new File(folderPth);
 
 		// check if the file exists within the folder
-		boolean fileExists = false;
 
 		if (folder.exists() && folder.isDirectory()) {
 			File[] files = folder.listFiles();
 
 			for (File file : files) {
 				if (file.isFile() && file.getName().equals(filenm)) {
-					fileExists = true;
-					break;
+					return file;
 				}
 			}
 
 		}
 
-		// if the fileExists check if the dob is the same
-		if (fileExists) {
-			File patientFile = new File(folderPth, filenm);
-			try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
-				String line;
-
-				while ((line = br.readLine()) != null) {
-					String[] fields = line.split(":");
-
-					if (fields.length == 2 && fields[0].trim().equals("Date of Birth")) {
-						String inputtedDob = fields[1].trim();
-
-						if (dob.equals(inputtedDob)) {
-							return patientFile;
-						}
-					}
-				}
-
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-				return null;
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-//				e.printStackTrace();
-				return null;
-			}
+		File patientFile = new File(folderPth, filenm);
+		try {
+			patientFile.createNewFile();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 
-		return null;
+		return patientFile;
 	}
 
-	//create Popups
+//	//check patient record within the patientInfo folder
+//	private File checkRecords(String firstName, String lastName, String dob) {
+//
+//		String folderPth = "patientInfo";
+//		//TODO add DOB to filename
+//		String filenm = firstName + "_" + lastName + "_" + dob + "_" +"patientinfo.txt";
+//
+//		File folder = new File(folderPth);
+//
+//		// check if the file exists within the folder
+//		boolean fileExists = false;
+//
+//		if (folder.exists() && folder.isDirectory()) {
+//			File[] files = folder.listFiles();
+//
+//			for (File file : files) {
+//				if (file.isFile() && file.getName().equals(filenm)) {
+//					fileExists = true;
+//					break;
+//				}
+//			}
+//
+//		}
+//
+//		// if the fileExists check if the dob is the same
+//		if (fileExists) {
+//			File patientFile = new File(folderPth, filenm);
+//			try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
+//				String line;
+//
+//				while ((line = br.readLine()) != null) {
+//					String[] fields = line.split(":");
+//
+//					if (fields.length == 2 && fields[0].trim().equals("Date of Birth")) {
+//						String inputtedDob = fields[1].trim();
+//
+//						if (dob.equals(inputtedDob)) {
+//							return patientFile;
+//						}
+//					}
+//				}
+//
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+////				e.printStackTrace();
+//				return null;
+//			} catch (IOException e) {
+//				// TODO Auto-generated catch block
+////				e.printStackTrace();
+//				return null;
+//			}
+//		}
+//
+//		return null;
+//	}
+
+	// create Popups
 	private void createPopup(String errorString, boolean actualError) {
 		Stage popupStage = new Stage();
 		popupStage.initModality(Modality.APPLICATION_MODAL); // Makes the popup modal

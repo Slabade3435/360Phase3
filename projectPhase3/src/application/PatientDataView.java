@@ -62,9 +62,16 @@ public class PatientDataView {
 
 		Tab healthResourcesTab = new Tab("Health and Wellness Resources");
 		healthResourcesTab.setContent(createHealthResourcesTab());
+		
+		Tab logOutTab = new Tab("Log Out");
+		logOutTab.setOnSelectionChanged(e -> {
+			if(logOutTab.isSelected()) {
+				ownerStage.setScene(previousScene);
+			}
+		});
 
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(personalInfoTab, patientHistoryTab, appointmentSummaryTab, insuranceInfoTab, pharmacyInfoTab, healthResourcesTab);
+		tabPane.getTabs().addAll(personalInfoTab, patientHistoryTab, appointmentSummaryTab, insuranceInfoTab, pharmacyInfoTab, healthResourcesTab, logOutTab);
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
@@ -193,14 +200,14 @@ public class PatientDataView {
 	private BorderPane createAppointmentSummaryTab() {
 		BorderPane root = new BorderPane();
 
-		Label summaryLabel = new Label("Appointment Summary:");
+		Label summaryLabel = new Label("Diagnosis by Doctor:");
 		summaryLabel.setFont(Font.font("Arial", 30));
 
 		// TextArea to display appointment summary
 		TextArea summaryTextArea = new TextArea();
 		summaryTextArea.setPrefRowCount(10);
 		summaryTextArea.setEditable(false);
-		summaryTextArea.setText(fileField("Appointment Summary"));
+		summaryTextArea.setText(retrieveTextArea("Diagnosis"));
 
 		// Layout setup
 		VBox vbox = new VBox(20, summaryLabel, summaryTextArea);
@@ -210,6 +217,46 @@ public class PatientDataView {
 		root.setCenter(vbox);
 
 		return root;
+	}
+	
+	private String retrieveTextArea(String fieldName) {
+		StringBuilder notesBuilder = new StringBuilder();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
+			String line;
+			boolean startNotes = false;
+
+			while ((line = br.readLine()) != null) {
+				if (startNotes) {
+
+					if (line.contains(":")) {
+						break;
+					}
+
+					notesBuilder.append(line).append("\n");
+				} else {
+					String[] fields = line.split(":");
+
+					if (fields[0].trim().equals(fieldName)) {
+						notesBuilder.append(fields[1].trim()).append("\n");
+						startNotes = true;
+
+					}
+
+				}
+
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return notesBuilder.toString();
+
 	}
 
 	private BorderPane createPatientHistoryTab() {
@@ -365,6 +412,39 @@ public class PatientDataView {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	private String mutipleFileFields(String field1, String field2) {
+		String resultString = "";
+		StringBuilder fileContent = new StringBuilder();
+		
+		
+		try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
+			String line;
+			
+
+			while ((line = br.readLine()) != null) {
+				String[] fields = line.split(":");
+
+				if (fields[0].trim().equals(field1) || fields[0].trim().equals(field2)) {
+					fileContent.append(fields[1].trim()).append("\n");
+
+				}
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		resultString = fileContent.toString();
+		return resultString;
+		
+		
+		
 	}
 
 	private String fileField(String field) {
