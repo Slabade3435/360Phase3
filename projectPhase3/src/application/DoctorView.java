@@ -1,27 +1,41 @@
 package application;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.time.LocalDate;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class DoctorView {
-	public Scene patientTabs(Scene previousScene, Stage ownerStage, File patientFile) {
+	File patientFile;
+
+	public Scene patientTabs(Scene previousScene, Stage ownerStage, File pFile) {
+		this.patientFile = pFile;
+
 		BorderPane root = new BorderPane();
 		root.setStyle("-fx-background-color: white;");
 		Scene scene = new Scene(root, 900, 600);
@@ -32,7 +46,7 @@ public class DoctorView {
 
 		// Create and add tabs to the TabPane
 		Tab PatientHisTab = new Tab("History");
-		PatientHisTab.setContent(createHistoryContent(patientFile));
+		PatientHisTab.setContent(createHistoryContent());
 
 		Tab PhysicalTestTab = new Tab("Physical Test");
 		PhysicalTestTab.setContent(physicalTest());
@@ -41,11 +55,20 @@ public class DoctorView {
 		DiagnosisTab.setContent(diagnosis());
 
 		Tab PrescriptionTab = new Tab("Prescription");
+		PrescriptionTab.setContent(prescription());
 
 		Tab NotesTab = new Tab("Notes");
-
+		NotesTab.setContent(notes());
+		
+		Tab logOutTab = new Tab("Back to Patient Look up");
+		logOutTab.setOnSelectionChanged(e -> {
+			if(logOutTab.isSelected()) {
+				ownerStage.setScene(previousScene);
+			}
+		});
+		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab);
+		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
@@ -54,7 +77,7 @@ public class DoctorView {
 
 	}
 
-	private String fileField(String field, File patientFile) {
+	private String fileField(String field) {
 		String resultString = "";
 
 		try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
@@ -65,7 +88,7 @@ public class DoctorView {
 
 				if (fields.length == 2 && fields[0].trim().equals(field)) {
 					resultString = fields[1].trim();
-					
+
 				}
 			}
 
@@ -81,19 +104,18 @@ public class DoctorView {
 
 	}
 
-	private VBox createHistoryContent(File patientFile) {
+	private VBox createHistoryContent() {
 		VBox historyContent = new VBox();
-		historyContent.setAlignment(Pos.CENTER);
+		historyContent.setAlignment(Pos.TOP_CENTER);
 
-		Label historyLabel = new Label("Patient History:");
-		historyLabel.setStyle("-fx-font-size: 24px;"); // Set font size
+		Label historyLabel = new Label("History");
+		historyLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size and color
 		historyContent.getChildren().add(historyLabel);
 
 		GridPane gridPane = new GridPane();
-		gridPane.setVgap(30);
-		gridPane.setHgap(60);
+		gridPane.setVgap(10); // Reduced vertical gap
+		gridPane.setHgap(10);
 		gridPane.setPadding(new Insets(20));
-		
 
 		Label firstNameLabel = new Label("First Name:");
 		Label lastNameLabel = new Label("Last Name:");
@@ -103,87 +125,73 @@ public class DoctorView {
 		// Non-editable text fields
 		TextField firstNameField = new TextField();
 		firstNameField.setEditable(false);
-		firstNameField.setText(fileField("First Name", patientFile));
-		
+		firstNameField.setText(fileField("First Name"));
+
 		TextField lastNameField = new TextField();
 		lastNameField.setEditable(false);
-		lastNameField.setText(fileField("Last Name", patientFile));
-		
-		
-		TextField dobField = new TextField();
-		dobField.setEditable(false);
-		dobField.setText(fileField("Date of Birth", patientFile));
-		
+		lastNameField.setText(fileField("Last Name"));
+
+		DatePicker dobField = new DatePicker();
+		String dateOnFile = fileField("Date of Birth");
+		if (dateOnFile.equals("")) {
+			dobField.setValue(null);
+		} else {
+			dobField.setValue(LocalDate.parse(dateOnFile));
+		}
+
 		TextField ageField = new TextField();
 		ageField.setEditable(false);
-		ageField.setText(fileField("Age", patientFile));
+		ageField.setText(fileField("Age"));
 
 		gridPane.addRow(0, firstNameLabel, firstNameField);
 		gridPane.addRow(1, lastNameLabel, lastNameField);
 		gridPane.addRow(2, dobLabel, dobField);
 		gridPane.addRow(3, ageLabel, ageField);
 
-		historyContent.getChildren().add(gridPane);
+		// Create a VBox for buttons
+		VBox buttonBox = new VBox(10);
+		buttonBox.setAlignment(Pos.BOTTOM_LEFT);
+		buttonBox.setPadding(new Insets(20, 0, 0, 20)); // Set padding from top and left
 
-//		// Add buttons and text fields
-//		TextArea immunizationText = new TextArea();
-//		immunizationText.setEditable(false);
-//		immunizationText.setPrefWidth(50);
-//		immunizationText.setPrefHeight(100); // Set height
-//		immunizationText.setVisible(false);
-//
-//		TextArea medicalHistoryText = new TextArea();
-//		medicalHistoryText.setEditable(false);
-//		medicalHistoryText.setPrefWidth(50);
-//		medicalHistoryText.setPrefHeight(100);
-//		medicalHistoryText.setVisible(false);
-//
-//		TextArea medicationText = new TextArea();
-//		medicationText.setEditable(false);
-//		medicationText.setPrefWidth(50);
-//		medicationText.setPrefHeight(100);
-//		medicationText.setVisible(false);
-//
-//		Button immunizationButton = new Button("Immunization Records");
-//		Button medicalHistoryButton = new Button("Previous Medical History");
-//		Button medicationButton = new Button("Previous Medication");
-//
-//		immunizationButton.setOnAction(e -> {
-//			toggleTextFieldVisibility(immunizationText);
-//			medicalHistoryText.setVisible(false);
-//			medicationText.setVisible(false);
-//		});
-//		medicalHistoryButton.setOnAction(e -> {
-//			toggleTextFieldVisibility(medicalHistoryText);
-//			immunizationText.setVisible(false);
-//			medicationText.setVisible(false);
-//		});
-//		medicationButton.setOnAction(e -> {
-//			toggleTextFieldVisibility(medicationText);
-//			immunizationText.setVisible(false);
-//			medicalHistoryText.setVisible(false);
-//		});
-//
-//		// Set button size
-//		immunizationButton.setPrefSize(200, 50);
-//		medicalHistoryButton.setPrefSize(200, 50);
-//		medicationButton.setPrefSize(200, 50);
-//
-//		VBox buttonsBox = new VBox(20); // Increased spacing between buttons
-//		buttonsBox.setAlignment(Pos.CENTER);
-//		buttonsBox.getChildren().addAll(immunizationButton, medicalHistoryButton, medicationButton);
-//
-//		VBox textFieldsBox = new VBox(10);
-//		textFieldsBox.setAlignment(Pos.CENTER);
-//		textFieldsBox.getChildren().addAll(immunizationText, medicalHistoryText, medicationText);
-//
-//		historyContent.getChildren().addAll(buttonsBox, textFieldsBox);
+		Button immunizationButton = new Button("Immunization Records");
+		immunizationButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white;");
+		immunizationButton.setPrefSize(200, 50); // Set button size
+
+		Button medicalHistoryButton = new Button("Previous Medical History");
+		medicalHistoryButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white;");
+		medicalHistoryButton.setPrefSize(200, 50); // Set button size
+
+		Button medicationButton = new Button("Previous Medication");
+		medicationButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white;");
+		medicationButton.setPrefSize(200, 50); // Set button size
+
+		// Create a TextArea
+		TextArea textArea = new TextArea();
+		textArea.setEditable(false);
+		double height = 250; // making a variable called height with a value 150
+		double width = 400; // making a variable called height with a value 300
+		textArea.setPrefHeight(height);
+		textArea.setPrefWidth(width);
+
+		HBox totalBox = new HBox(10);
+		totalBox.getChildren().addAll(buttonBox, textArea);
+
+		// Add event handlers to update text area
+		immunizationButton.setOnAction(e -> textArea.setText(fileField("History of Immunization")));
+		medicalHistoryButton.setOnAction(e -> textArea.setText(fileField("Previous Health Issues")));
+		medicationButton.setOnAction(e -> textArea.setText(fileField("Previous Medications")));
+
+		// Add buttons to the button VBox
+		buttonBox.getChildren().addAll(immunizationButton, medicalHistoryButton, medicationButton);
+
+		// Add a vertical gap between the grid pane and the button VBox
+		VBox.setMargin(buttonBox, new Insets(20, 0, 0, 0));
+
+		// Add the button VBox and text area to the historyContent VBox
+
+		historyContent.getChildren().addAll(gridPane, totalBox);
 
 		return historyContent;
-	}
-
-	private void toggleTextFieldVisibility(TextArea immunizationText) {
-		immunizationText.setVisible(!immunizationText.isVisible());
 	}
 
 	private VBox physicalTest() {
@@ -191,11 +199,12 @@ public class DoctorView {
 		physicalTest.setAlignment(Pos.TOP_CENTER);
 
 		Label physicalTestL = new Label("Physical");
-		physicalTestL.setStyle("-fx-font-size: 24px;"); // Set font size
+		physicalTestL.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size
 		physicalTest.getChildren().add(physicalTestL);
 
 		GridPane gridPane = new GridPane();
 		gridPane.setVgap(10);
+		gridPane.setHgap(10);
 		gridPane.setPadding(new Insets(20));
 
 		Label firstNameLabel = new Label("First Name:");
@@ -204,58 +213,104 @@ public class DoctorView {
 		Label ageLable = new Label("Age:");
 
 		Label allergieLabel = new Label("Allergies:");
-		Label ShellFishLabel = new Label("Shellfish:");
-		Label BeestingLabel = new Label("Beestings");
-		Label foodsLabel = new Label("Foods:");
-
-//		RadioButton yesButton1 = new RadioButton("yes");
-//		RadioButton noButton1 = new RadioButton("no");
-//
-//		RadioButton yesButton2 = new RadioButton("yes");
-//		RadioButton noButton2 = new RadioButton("no");
-//
-//		RadioButton yesButton3 = new RadioButton("yes");
-//		RadioButton noButton3 = new RadioButton("no");
-//
-//		// Set ToggleGroup for each pair of yes and no buttons if necessary
-//		ToggleGroup toggleGroup1 = new ToggleGroup();
-//		yesButton1.setToggleGroup(toggleGroup1);
-//		noButton1.setToggleGroup(toggleGroup1);
-//
-//		ToggleGroup toggleGroup2 = new ToggleGroup();
-//		yesButton2.setToggleGroup(toggleGroup2);
-//		noButton2.setToggleGroup(toggleGroup2);
-//
-//		ToggleGroup toggleGroup3 = new ToggleGroup();
-//		yesButton3.setToggleGroup(toggleGroup3);
-//		noButton3.setToggleGroup(toggleGroup3);
 
 		// Non-editable text fields
 		TextField firstNameField = new TextField();
 		firstNameField.setEditable(false);
+		firstNameField.setText(fileField("First Name"));
+
 		TextField lastNameField = new TextField();
 		lastNameField.setEditable(false);
-		TextField dobField = new TextField();
-		dobField.setEditable(false);
+		lastNameField.setText(fileField("Last Name"));
+
+		DatePicker dobField = new DatePicker();
+		String dateOnFile = fileField("Date of Birth");
+		if (dateOnFile.equals("")) {
+			dobField.setValue(null);
+		} else {
+			dobField.setValue(LocalDate.parse(dateOnFile));
+		}
+
 		TextField ageField = new TextField();
 		ageField.setEditable(false);
+		ageField.setText(fileField("Age"));
 
-		TextArea note = new TextArea("Please List");
-		note.setPrefWidth(100);
-		note.setPrefHeight(100);
-		// physicalTest.getChildren().add(note);
+		TextArea allergyNote = new TextArea(retrieveTextArea("Allergies"));
+
+		VBox textBox = new VBox(10);
+		textBox.getChildren().add(allergyNote);
+		textBox.setAlignment(Pos.BOTTOM_LEFT);
+		HBox totalBox = new HBox(10);
+		totalBox.getChildren().add(textBox);
 
 		gridPane.addRow(0, firstNameLabel, firstNameField);
 		gridPane.addRow(1, lastNameLabel, lastNameField);
 		gridPane.addRow(2, dobLabel, dobField);
 		gridPane.addRow(3, ageLable, ageField);
-		gridPane.addRow(5, allergieLabel);
-//		gridPane.addRow(6, ShellFishLabel, yesButton1, noButton1);
-//		gridPane.addRow(7, BeestingLabel, yesButton2, noButton2);
-//		gridPane.addRow(8, foodsLabel, yesButton3, noButton3);
-		physicalTest.getChildren().add(gridPane);
+		gridPane.addRow(4, allergieLabel, allergyNote);
+		physicalTest.getChildren().addAll(gridPane, totalBox);
+
+		Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(e -> {
+			saveChangesForTextArea(allergyNote, "Allergies:");
+		});
+//		Button saveButton = createSaveButtonForTextArea(allergyNote, "Allergies");
+		physicalTest.getChildren().add(saveButton);
 
 		return physicalTest;
+
+	}
+
+	private void saveChangesForTextArea(TextArea notesTextArea, String fieldName) {
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(patientFile))) {
+			StringBuilder fileContent = new StringBuilder();
+			String line;
+			boolean foundField = false;
+			boolean addField = false;
+
+			while ((line = reader.readLine()) != null) {
+
+				if (line.startsWith(fieldName)) {
+					foundField = true;
+					addField = true;
+				}
+
+				if (foundField) {
+//					System.out.println("Not ")
+					if (!line.startsWith(fieldName)) {
+						if (line.contains(":")) {
+							fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+							fileContent.append(line).append("\n");
+							foundField = false;
+						}
+					}
+
+				} else {
+					fileContent.append(line).append("\n");
+				}
+
+			}
+
+			if (!addField) {
+				fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+			} else if (addField && foundField) {
+				fileContent.append(fieldName).append(" ").append(notesTextArea.getText()).append("\n");
+			}
+
+			// Write the updated content back to the file
+			try (BufferedWriter writer = new BufferedWriter(new FileWriter(patientFile))) {
+				writer.write(fileContent.toString());
+				writer.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 
@@ -264,9 +319,229 @@ public class DoctorView {
 		diagnosis.setAlignment(Pos.TOP_CENTER);
 
 		Label diagnosisL = new Label("Diagnosis");
-		diagnosisL.setStyle("-fx-font-size: 24px;"); // Set font size
+		diagnosisL.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size
 		diagnosis.getChildren().add(diagnosisL);
 
+		TextArea diagnosisT = new TextArea(retrieveTextArea("Diagnosis"));
+		diagnosisT.setPrefWidth(300);
+		diagnosisT.setPrefHeight(300);
+
+		Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(e -> {
+			saveChangesForTextArea(diagnosisT, "Diagnosis:");
+		});
+
+		HBox totalBox = new HBox(10);
+		totalBox.getChildren().add(diagnosisT); // Add text area and
+		totalBox.getChildren().add(saveButton);
+		// button
+		totalBox.setAlignment(Pos.CENTER);
+
+		diagnosis.getChildren().add(totalBox);
 		return diagnosis;
 	}
+
+	private VBox prescription() {
+		VBox prescription = new VBox();
+		prescription.setAlignment(Pos.TOP_CENTER);
+
+		Label preSLabel = new Label("Prescription");
+		preSLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size
+
+		GridPane gridPane = new GridPane();
+		gridPane.setVgap(5); // Reduced vertical gap
+		gridPane.setPadding(new Insets(20));
+		gridPane.setAlignment(Pos.CENTER);
+
+		Label mediactionLabel = new Label("Medication: ");
+		Label doseLabel = new Label("Dose (mg): ");
+		Label frequencyLabel = new Label("Frequency :");
+
+		// Non-editable text fields
+		TextField medicationField = new TextField();
+		TextField doseField = new TextField();
+		TextField frequencyField = new TextField();
+
+		gridPane.addRow(0, mediactionLabel, medicationField);
+		gridPane.addRow(1, doseLabel, doseField);
+		gridPane.addRow(2, frequencyLabel, frequencyField);
+
+		// Create TableView for prescriptions
+		// Create TableView for prescriptions
+		TableView<PrescriptionEntry> prescriptionTable = new TableView<>();
+		TableColumn<PrescriptionEntry, String> medicationColumn = new TableColumn<>("Medication");
+		medicationColumn.setCellValueFactory(new PropertyValueFactory<>("medication"));
+		medicationColumn.setMinWidth(200); // Set minimum width for medication column
+
+		TableColumn<PrescriptionEntry, String> doseColumn = new TableColumn<>("Dose (mg)");
+		doseColumn.setCellValueFactory(new PropertyValueFactory<>("dose"));
+		doseColumn.setMinWidth(200); // Set minimum width for dose column
+
+		TableColumn<PrescriptionEntry, String> frequencyColumn = new TableColumn<>("Frequency");
+		frequencyColumn.setCellValueFactory(new PropertyValueFactory<>("frequency"));
+		frequencyColumn.setMinWidth(200); // Set minimum width for frequency column
+
+		prescriptionTable.getColumns().addAll(medicationColumn, doseColumn, frequencyColumn); // IMPORTANT DO NOT
+																								// DELETE: DISPLAYS
+		// TABLE COLUMNS
+
+		Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(event -> {
+			String medication = medicationField.getText();
+			String dose = doseField.getText();
+			String frequency = frequencyField.getText();
+
+			try (FileWriter writer = new FileWriter(patientFile, true)) {
+				writer.write("Medication: " + medication + "\n");
+				writer.write("Dose (mg): " + dose + "\n");
+				writer.write("Frequency: " + frequency + "\n\n");
+				writer.flush();
+				medicationField.clear();
+				doseField.clear();
+				frequencyField.clear();
+				updatePrescriptionTable(prescriptionTable);
+			} catch (IOException e) {
+				System.err.println("Error writing to file: " + e.getMessage());
+			}
+
+		});
+
+		HBox buttonBox = new HBox(10);
+		buttonBox.getChildren().add(saveButton);
+		buttonBox.setAlignment(Pos.CENTER);
+
+		updatePrescriptionTable(prescriptionTable);
+
+		prescription.getChildren().addAll(preSLabel, gridPane, buttonBox, prescriptionTable);
+
+		return prescription;
+	}
+
+	private void updatePrescriptionTable(TableView<PrescriptionEntry> prescriptionTable) {
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(patientFile))) {
+			ObservableList<PrescriptionEntry> entries = FXCollections.observableArrayList();
+			String line;
+			String medication = null;
+			String dose = null;
+			String frequency = null;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("Medication: ")) {
+					medication = line.substring("Medication: ".length());
+				} else if (line.startsWith("Dose (mg): ")) {
+					dose = line.substring("Dose (mg): ".length());
+				} else if (line.startsWith("Frequency: ")) {
+					frequency = line.substring("Frequency: ".length());
+					entries.add(new PrescriptionEntry(medication, dose, frequency));
+					medication = null;
+					dose = null;
+					frequency = null;
+				}
+			}
+			prescriptionTable.setItems(entries);
+		} catch (IOException e) {
+			System.err.println("Error reading file: " + e.getMessage());
+		}
+	}
+
+	// Define a class to represent a prescription entry
+	public class PrescriptionEntry {
+		private String medication;
+		private String dose;
+		private String frequency;
+
+		public PrescriptionEntry(String medication, String dose, String frequency) {
+			this.medication = medication;
+			this.dose = dose;
+			this.frequency = frequency;
+		}
+
+		public String getMedication() {
+			return medication;
+		}
+
+		public String getDose() {
+			return dose;
+		}
+
+		public String getFrequency() {
+			return frequency;
+		}
+	}
+
+	private VBox notes() {
+		VBox notes = new VBox();
+		notes.setAlignment(Pos.TOP_CENTER);
+
+		Label noteLabel = new Label("Notes");
+		noteLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size
+		notes.getChildren().add(noteLabel);
+
+		GridPane gridPane = new GridPane();
+		gridPane.setVgap(10);
+		gridPane.setPadding(new Insets(20));
+
+		Label notesLabel = new Label("Additional Notes:");
+		gridPane.addRow(0, notesLabel);
+
+		TextArea notesTextArea = new TextArea(retrieveTextArea("Additional Notes"));
+		notesTextArea.setPrefWidth(400);
+		notesTextArea.setPrefHeight(400);
+
+		HBox totalBox = new HBox(10);
+		Button saveButton = new Button("Save");
+		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
+		saveButton.setOnAction(e -> {
+			saveChangesForTextArea(notesTextArea, "Additional Notes:");
+		});
+
+		totalBox.getChildren().addAll(notesTextArea, saveButton);
+		totalBox.setAlignment(Pos.CENTER);
+
+		notes.getChildren().addAll(gridPane, totalBox);
+		return notes;
+	}
+
+	private String retrieveTextArea(String fieldName) {
+		StringBuilder notesBuilder = new StringBuilder();
+
+		try (BufferedReader br = new BufferedReader(new FileReader(patientFile))) {
+			String line;
+			boolean startNotes = false;
+
+			while ((line = br.readLine()) != null) {
+				if (startNotes) {
+
+					if (line.contains(":")) {
+						break;
+					}
+
+					notesBuilder.append(line).append("\n");
+				} else {
+					String[] fields = line.split(":");
+
+					if (fields[0].trim().equals(fieldName)) {
+						notesBuilder.append(fields[1].trim()).append("\n");
+						startNotes = true;
+
+					}
+
+				}
+
+			}
+
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return notesBuilder.toString();
+
+	}
+
 }
