@@ -139,8 +139,7 @@ public class NursePatientLookUp {
 	}
 
 	//check patient record within the patientInfo folder
-	// check patient record within the patientInfo folder
-		private File checkRecords(String firstName, String lastName, String dob) {
+	private File checkRecords(String firstName, String lastName, String dob) {
 			
 			String folderPth = "patientInfo";
 			//TODO add DOB to filename
@@ -171,8 +170,6 @@ public class NursePatientLookUp {
 			
 			return patientFile;
 		}
-
-	
 
 	//create Popups
 	private void createPopup(String errorString, boolean actualError) {
