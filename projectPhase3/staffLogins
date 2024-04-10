@@ -1,4 +1,5 @@
 Username,Password,userType
-test,test,doctor
+test,test,nurse
+test,test1,doctor
 username,password,doctor
 siddhant,password,nurse

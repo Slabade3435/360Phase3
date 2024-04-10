@@ -28,6 +28,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
 public class DoctorView {
@@ -47,6 +48,9 @@ public class DoctorView {
 		// Create and add tabs to the TabPane
 		Tab PatientHisTab = new Tab("History");
 		PatientHisTab.setContent(createHistoryContent());
+		
+		Tab PatientVitalTab = new Tab("Vital History");
+		PatientVitalTab.setContent(createVitalHistory());
 
 		Tab PhysicalTestTab = new Tab("Physical Test");
 		PhysicalTestTab.setContent(physicalTest());
@@ -68,7 +72,8 @@ public class DoctorView {
 		});
 		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
+		tabPane.getTabs().addAll(PatientHisTab, PatientVitalTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
+//		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
@@ -192,6 +197,87 @@ public class DoctorView {
 		historyContent.getChildren().addAll(gridPane, totalBox);
 
 		return historyContent;
+	}
+	
+	private BorderPane createVitalHistory() {
+		
+		BorderPane root = new BorderPane();
+		
+		Label vitalLabel = new Label("Patient Vitals");
+		vitalLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;");
+		root.setAlignment(vitalLabel, Pos.TOP_CENTER);
+		root.setTop(vitalLabel);
+
+		// Labels for fields
+		Label firstNameLabel = new Label("First Name:");
+		Label lastNameLabel = new Label("Last Name:");
+		Label dobLabel = new Label("Date of Birth:");
+		Label ageLabel = new Label("Age:");
+		Label weightLabel = new Label("Weight:");
+		Label heightLabel = new Label("Height:");
+		Label bodyTemperatureLabel = new Label("Body Temperature:");
+		Label bloodPressureLabel = new Label("Blood Pressure:");
+
+		// Text fields for editable information
+		TextField firstNameField = new TextField();
+		firstNameField.setText(fileField("First Name"));
+		firstNameField.setEditable(false);
+
+		TextField lastNameField = new TextField();
+		lastNameField.setText(fileField("Last Name"));
+		lastNameField.setEditable(false);
+
+		DatePicker dobField = new DatePicker();
+		String dateOnFile = fileField("Date of Birth");
+		if (dateOnFile.equals("")) {
+			dobField.setValue(null);
+		} else {
+			dobField.setValue(LocalDate.parse(dateOnFile));
+		}
+		dobField.setEditable(false);
+		
+		TextField ageField = new TextField();
+		ageField.setText(fileField("Age"));
+		ageField.setEditable(false);
+		
+		TextField weightField = new TextField();
+		weightField.setText(fileField("Weight"));
+		weightField.setEditable(false);
+		
+		TextField heightField = new TextField();
+		heightField.setText(fileField("Height"));
+		heightField.setEditable(false);
+		
+		TextField bodyTemperatureField = new TextField();
+		bodyTemperatureField.setText(fileField("Body Temperature"));
+		bodyTemperatureField.setEditable(false);
+		
+		TextField bloodPressureField = new TextField();
+		bloodPressureField.setText(fileField("Blood Pressure"));
+		bloodPressureField.setEditable(false);
+
+		// Layout setup
+		GridPane gridPane = new GridPane();
+		gridPane.addRow(0, firstNameLabel, firstNameField);
+		gridPane.addRow(1, lastNameLabel, lastNameField);
+		gridPane.addRow(2, dobLabel, dobField);
+		gridPane.addRow(3, ageLabel, ageField);
+		gridPane.addRow(4, heightLabel, heightField);
+		gridPane.addRow(5, weightLabel, weightField);
+		gridPane.addRow(6, bodyTemperatureLabel, bodyTemperatureField);
+		gridPane.addRow(7, bloodPressureLabel, bloodPressureField);
+		
+	    gridPane.setHgap(10);
+	    gridPane.setVgap(10);
+	    gridPane.setAlignment(Pos.CENTER);
+
+	    VBox vbox = new VBox(20, gridPane);
+	    vbox.setAlignment(Pos.CENTER);
+	    vbox.setPadding(new Insets(50));
+
+	    root.setCenter(vbox);
+
+	    return root;
 	}
 
 	private VBox physicalTest() {
