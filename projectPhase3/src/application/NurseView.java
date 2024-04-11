@@ -57,6 +57,8 @@ public class NurseView {
 		
 		Tab patientHistoryTab = new Tab("Patient History");
 		patientHistoryTab.setContent(createpatientHistoryTab());
+
+		Messages patientMessaging = new Messages();
 		
 		Tab logOutTab = new Tab("Back to Patient Look Up");
 		logOutTab.setOnSelectionChanged(e -> {
@@ -66,7 +68,7 @@ public class NurseView {
 		});
 		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(vitalsTab, allergiesTab, healthConcernsTab, patientHistoryTab, logOutTab );
+		tabPane.getTabs().addAll(vitalsTab, allergiesTab, healthConcernsTab, patientHistoryTab, patientMessaging.createTab(), logOutTab );
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
