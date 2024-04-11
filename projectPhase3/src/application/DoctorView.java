@@ -66,8 +66,6 @@ public class DoctorView {
 
 		Messages doctorMessaging = new Messages();
 		
-		Messages doctorMessaging = new Messages();
-		
 		Tab logOutTab = new Tab("Back to Patient Look up");
 		logOutTab.setOnSelectionChanged(e -> {
 			if(logOutTab.isSelected()) {
