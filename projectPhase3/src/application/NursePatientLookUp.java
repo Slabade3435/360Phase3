@@ -85,6 +85,7 @@ public class NursePatientLookUp {
 		Label dobLabel = new Label("Date of Birth: ");
 		dobLabel.setFont(Font.font("Arial", 20));
 
+		//Date Picker
 		DatePicker dobPicker = new DatePicker();
 		dobPicker.setPrefSize(200, 40);
 
@@ -100,6 +101,7 @@ public class NursePatientLookUp {
 		root.setLeft(searchPatient);
 		root.setAlignment(searchPatient, Pos.CENTER);
 
+		//search button
 		Button searchButton = new Button("Search");
 		searchButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
 		searchButton.setOnAction(e -> {
@@ -148,7 +150,6 @@ public class NursePatientLookUp {
 			File folder = new File(folderPth);
 
 			// check if the file exists within the folder
-
 			if (folder.exists() && folder.isDirectory()) {
 				File[] files = folder.listFiles();
 
