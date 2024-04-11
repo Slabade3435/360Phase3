@@ -65,8 +65,6 @@ public class PatientDataView {
 
 		Messages2 patientMessaging = new Messages2();
 		
-		Messages2 patientMessaging = new Messages2();
-		
 		Tab logOutTab = new Tab("Log Out");
 		logOutTab.setOnSelectionChanged(e -> {
 			if(logOutTab.isSelected()) {
