@@ -336,7 +336,7 @@ public class DoctorView {
 		textBox.setAlignment(Pos.BOTTOM_LEFT);
 		HBox totalBox = new HBox(10);
 		totalBox.getChildren().add(textBox);
-
+//layouts
 		gridPane.addRow(0, firstNameLabel, firstNameField);
 		gridPane.addRow(1, lastNameLabel, lastNameField);
 		gridPane.addRow(2, dobLabel, dobField);
@@ -355,7 +355,7 @@ public class DoctorView {
 		return physicalTest;
 
 	}
-
+	//saves changes for the text area
 	private void saveChangesForTextArea(TextArea notesTextArea, String fieldName) {
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(patientFile))) {
@@ -407,7 +407,7 @@ public class DoctorView {
 		}
 
 	}
-
+	//diagnosis tabpane
 	private VBox diagnosis() {
 		VBox diagnosis = new VBox();
 		diagnosis.setAlignment(Pos.TOP_CENTER);
@@ -435,7 +435,7 @@ public class DoctorView {
 		diagnosis.getChildren().add(totalBox);
 		return diagnosis;
 	}
-
+	//prescription tabpane
 	private VBox prescription() {
 		VBox prescription = new VBox();
 		prescription.setAlignment(Pos.TOP_CENTER);
@@ -479,7 +479,7 @@ public class DoctorView {
 		prescriptionTable.getColumns().addAll(medicationColumn, doseColumn, frequencyColumn); // IMPORTANT DO NOT
 																								// DELETE: DISPLAYS
 		// TABLE COLUMNS
-
+		//saves the prescrpiton that is added
 		Button saveButton = new Button("Save");
 		saveButton.setStyle("-fx-background-color: #0844a4; -fx-text-fill: white; -fx-font-size: 20px;");
 		saveButton.setOnAction(event -> {
@@ -512,7 +512,7 @@ public class DoctorView {
 
 		return prescription;
 	}
-
+	//updates the prescription table
 	private void updatePrescriptionTable(TableView<PrescriptionEntry> prescriptionTable) {
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(patientFile))) {
