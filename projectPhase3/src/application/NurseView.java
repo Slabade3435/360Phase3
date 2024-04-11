@@ -59,7 +59,8 @@ public class NurseView {
 		patientHistoryTab.setContent(createpatientHistoryTab());
 
 		Messages patientMessaging = new Messages();
-		
+
+		//log out tab 
 		Tab logOutTab = new Tab("Back to Patient Look Up");
 		logOutTab.setOnSelectionChanged(e -> {
 			if(logOutTab.isSelected()) {
@@ -85,7 +86,7 @@ public class NurseView {
 		Label prevMedsLabel = new Label("Previously Prescribed Medication:");
 		Label immunizationLabel = new Label("History of Immunization:");
 
-		// Text fields for editable information
+		// Text fields for non-editable information
 		TextField prevHealthIssuesField = new TextField();
 		prevHealthIssuesField.setEditable(false);
 		prevHealthIssuesField.setText(fileField("Previous Health Issues"));
