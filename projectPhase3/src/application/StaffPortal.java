@@ -95,7 +95,9 @@ public class StaffPortal {
 					ownerStage.setScene(new DoctorPatientLookUp().patientLookUp(scene, ownerStage, userNameInput));
 				} else {
 					//TODO connect to nurse view page
-					System.out.println("The staff member is a nurse");
+//					System.out.println("The staff member is a nurse");
+					ownerStage.setScene(new NursePatientLookUp().patientLookUp(scene, ownerStage, userNameInput));
+					
 				}
 			}
 
