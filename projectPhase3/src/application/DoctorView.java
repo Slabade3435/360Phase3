@@ -63,6 +63,8 @@ public class DoctorView {
 
 		Tab NotesTab = new Tab("Notes");
 		NotesTab.setContent(notes());
+
+		Messages doctorMessaging = new Messages();
 		
 		Messages doctorMessaging = new Messages();
 		
@@ -74,8 +76,9 @@ public class DoctorView {
 		});
 		
 		// Add tabs to the tab pane
-		tabPane.getTabs().addAll(PatientHisTab, PatientVitalTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, doctorMessaging.createTab(),logOutTab);
-//		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, logOutTab);
+    
+		tabPane.getTabs().addAll(PatientHisTab, PhysicalTestTab, DiagnosisTab, PrescriptionTab, NotesTab, doctorMessaging.createTab(), logOutTab);
+
 
 		// Set the TabPane to the top of the BorderPane
 		root.setTop(tabPane);
@@ -83,7 +86,7 @@ public class DoctorView {
 		return scene;
 
 	}
-
+	// reads the files
 	private String fileField(String field) {
 		String resultString = "";
 
@@ -111,10 +114,11 @@ public class DoctorView {
 
 	}
 
+	//displays the layout and contents in the history tab
 	private VBox createHistoryContent() {
 		VBox historyContent = new VBox();
 		historyContent.setAlignment(Pos.TOP_CENTER);
-
+		//history title
 		Label historyLabel = new Label("History");
 		historyLabel.setStyle("-fx-font-size: 24px; -fx-text-fill: #0844a4;"); // Set font size and color
 		historyContent.getChildren().add(historyLabel);
@@ -123,7 +127,7 @@ public class DoctorView {
 		gridPane.setVgap(10); // Reduced vertical gap
 		gridPane.setHgap(10);
 		gridPane.setPadding(new Insets(20));
-
+		//Labels
 		Label firstNameLabel = new Label("First Name:");
 		Label lastNameLabel = new Label("Last Name:");
 		Label dobLabel = new Label("Date of Birth:");
@@ -200,6 +204,7 @@ public class DoctorView {
 
 		return historyContent;
 	}
+
 	
 	private BorderPane createVitalHistory() {
 		
@@ -281,6 +286,9 @@ public class DoctorView {
 
 	    return root;
 	}
+
+
+	//displays layout and contents of the physical test tab
 
 	private VBox physicalTest() {
 		VBox physicalTest = new VBox();
