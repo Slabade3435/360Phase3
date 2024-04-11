@@ -205,7 +205,7 @@ public class DoctorView {
 		return historyContent;
 	}
 
-	
+	//creates vitals pane
 	private BorderPane createVitalHistory() {
 		
 		BorderPane root = new BorderPane();
@@ -567,6 +567,7 @@ public class DoctorView {
 		}
 	}
 
+	//creates notes pane
 	private VBox notes() {
 		VBox notes = new VBox();
 		notes.setAlignment(Pos.TOP_CENTER);
